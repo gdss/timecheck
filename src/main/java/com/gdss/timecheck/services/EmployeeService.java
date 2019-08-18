@@ -1,7 +1,7 @@
 package com.gdss.timecheck.services;
 
 import com.gdss.timecheck.models.Employee;
-import com.gdss.timecheck.models.EmployeeRepository;
+import com.gdss.timecheck.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

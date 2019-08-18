@@ -1,5 +1,6 @@
-package com.gdss.timecheck.models;
+package com.gdss.timecheck.repositories;
 
+import com.gdss.timecheck.models.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
