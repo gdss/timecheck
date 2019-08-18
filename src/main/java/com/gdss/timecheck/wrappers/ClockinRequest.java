@@ -1,4 +1,4 @@
-package com.gdss.timecheck.models;
+package com.gdss.timecheck.wrappers;
 
 import java.time.LocalDateTime;
 
