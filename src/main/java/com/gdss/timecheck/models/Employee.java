@@ -1,5 +1,6 @@
 package com.gdss.timecheck.models;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -7,6 +8,7 @@ import javax.persistence.Table;
 @Table(name = "employees")
 public class Employee extends AbstractEntity {
 
+    @Column(unique = true)
     private String pis;
 
     public String getPis() {
