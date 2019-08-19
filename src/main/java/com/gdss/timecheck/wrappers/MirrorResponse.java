@@ -2,15 +2,15 @@ package com.gdss.timecheck.wrappers;
 
 import com.gdss.timecheck.models.Employee;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 public class MirrorResponse {
 
     private Employee employee;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private YearMonth yearMonth;
     private List<MirrorDay> dayList;
+    private MirrorTotal total;
 
     public Employee getEmployee() {
         return employee;
@@ -20,20 +20,12 @@ public class MirrorResponse {
         this.employee = employee;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public YearMonth getYearMonth() {
+        return yearMonth;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public void setYearMonth(YearMonth yearMonth) {
+        this.yearMonth = yearMonth;
     }
 
     public List<MirrorDay> getDayList() {
@@ -44,4 +36,11 @@ public class MirrorResponse {
         this.dayList = dayList;
     }
 
+    public MirrorTotal getTotal() {
+        return total;
+    }
+
+    public void setTotal(MirrorTotal total) {
+        this.total = total;
+    }
 }

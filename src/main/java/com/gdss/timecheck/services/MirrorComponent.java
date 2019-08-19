@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,67 +20,97 @@ import java.util.stream.Collectors;
 @Component
 public class MirrorComponent {
 
-    private static final String WORKED_HOURS = "Horas Trabalhadas";
-    private static final String ESTIMATED_HOURS = "Horas Previstas";
-    private static final String STORED_HOURS = "Banco de Horas";
+    private static final String WORKED_HOURS_DAY = "Horas trabalhadas";
+    private static final String WORKED_HOURS_MONTH = "Horas trabalhadas no mês";
 
-    public MirrorResponse build(Employee employee, LocalDate startDate, LocalDate endDate, List<Clockin> clockinList) {
+    public MirrorResponse build(Employee employee, YearMonth yearMonth, List<Clockin> clockinList) {
         Map<LocalDate, List<LocalTime>> dateTimeListMap = clockinList.stream().collect(
                 Collectors.groupingBy(
                         Clockin::getDate, LinkedHashMap::new, Collectors.mapping(Clockin::getTime, Collectors.toList())
                 )
         );
+
+        Duration totalMonthDuration = Duration.ZERO;
         List<MirrorDay> dayList = new ArrayList<>();
-        dateTimeListMap.forEach((date, timeList) -> {
+        for (Map.Entry<LocalDate, List<LocalTime>> entry : dateTimeListMap.entrySet()) {
+            LocalDate date = entry.getKey();
+            List<LocalTime> timeList = entry.getValue();
+
+            Duration totalDayDuration = getWorkedHours(date, timeList);
+            totalMonthDuration = totalMonthDuration.plus(totalDayDuration);
+
+            MirrorTotal dayTotal = new MirrorTotal();
+            dayTotal.setDescription(WORKED_HOURS_DAY);
+            dayTotal.setValue(durationToString(totalDayDuration));
+
             MirrorDay day = new MirrorDay();
             day.setDate(date);
             day.setCheckList(timeList.stream().map(LocalTime::toString).collect(Collectors.toList()));
-            List<MirrorTotal> propertyList = new ArrayList<>();
-            MirrorTotal workedHours = getWorkedHours(timeList);
-            MirrorTotal estimatedHours = getEstimatedHours();
-            // MirrorTotal storedHours = getStoredHours(workedHours.getValue(), estimatedHours.getValue());
-            propertyList.add(workedHours);
-            propertyList.add(estimatedHours);
-            // propertyList.add(storedHours);
-            day.setPropertyList(propertyList);
+            day.setTotal(dayTotal);
             dayList.add(day);
-        });
+        }
+
+        MirrorTotal monthTotal = new MirrorTotal();
+        monthTotal.setDescription(WORKED_HOURS_MONTH);
+        monthTotal.setValue(durationToString(totalMonthDuration));
 
         MirrorResponse mirrorResponse = new MirrorResponse();
-        mirrorResponse.setEmployee(employee);
-        mirrorResponse.setStartDate(startDate);
-        mirrorResponse.setEndDate(endDate);
         mirrorResponse.setDayList(dayList);
-
+        mirrorResponse.setEmployee(employee);
+        mirrorResponse.setYearMonth(yearMonth);
+        mirrorResponse.setTotal(monthTotal);
         return mirrorResponse;
     }
 
-    private MirrorTotal getWorkedHours(List<LocalTime> timeList) {
-        LocalTime workedHours = LocalTime.of(0, 0, 0);
+    private Duration getWorkedHours(LocalDate date, List<LocalTime> timeList) {
+        Duration totalDuration = Duration.ZERO;
         for (int i = 0; i < timeList.size() - 1; i = i + 2) {
             LocalTime time1 = timeList.get(i);
             LocalTime time2 = timeList.get(i + 1);
-            workedHours = workedHours.plus(Duration.between(time1, time2));
+            Duration duration = Duration.between(time1, time2);
+
+            if (time1.getHour() < 6) {
+                // Para trabalho realizado antes das 06:00 a cada 60 minutos trabalhados são contabilizados 72 minutos.
+                if (time2.getHour() >= 6) {
+                    LocalTime constraint = LocalTime.of(6, 00);
+                    duration = Duration.ofMinutes((long) (duration.toMinutes() + Duration.between(time1, constraint).toMinutes() * 0.2));
+                } else {
+                    duration = Duration.ofMinutes((long) (duration.toMinutes() * 1.2));
+                }
+            }
+
+            if (time2.getHour() >= 22) {
+                // Para trabalho realizado após as 22:00 a cada 60 minutos trabalhados são contabilizados 72 minutos.
+                if (time1.getHour() < 22) {
+                    LocalTime constraint = LocalTime.of(22, 00);
+                    duration = Duration.ofMinutes((long) (duration.toMinutes() + Duration.between(constraint, time2).toMinutes() * 0.2));
+                } else {
+                    duration = Duration.ofMinutes((long) (duration.toMinutes() * 1.2));
+                }
+            }
+
+            switch (date.getDayOfWeek()) {
+                case SATURDAY:
+                    // Aos sábados a cada 60 minutos trabalhados são contabilizados 90 minutos.
+                    duration = Duration.ofMinutes((long) (duration.toMinutes() * 1.5));
+                    break;
+                case SUNDAY:
+                    // Aos domingos a cada 60 minutos trabalhados são contabilizados 120 minutos
+                    duration = duration.multipliedBy(2);
+                    break;
+                default:
+                    // De segunda a sexta feira a cada 60 minutos trabalhados são contabilizados 60 minutos.
+            }
+            totalDuration = totalDuration.plus(duration);
         }
-        MirrorTotal mirrorProperty = new MirrorTotal();
-        mirrorProperty.setDescription(WORKED_HOURS);
-        mirrorProperty.setValue(workedHours);
-        return mirrorProperty;
+        return totalDuration;
     }
 
-    private MirrorTotal getEstimatedHours() {
-        MirrorTotal mirrorProperty = new MirrorTotal();
-        mirrorProperty.setDescription(ESTIMATED_HOURS);
-        mirrorProperty.setValue(LocalTime.of(8, 0));
-        return mirrorProperty;
-    }
-
-    private MirrorTotal getStoredHours(LocalTime workedHours, LocalTime estimatedHours) {
-        MirrorTotal mirrorProperty = new MirrorTotal();
-        mirrorProperty.setDescription(STORED_HOURS);
-        LocalTime storedHours = estimatedHours.minus(Duration.between(LocalTime.of(0,0), workedHours));
-        mirrorProperty.setValue(storedHours);
-        return mirrorProperty;
+    private String durationToString(Duration duration) {
+        long minutesTotal = duration.toMinutes();
+        long hours = minutesTotal / 60;
+        long minutes = minutesTotal % 60;
+        return String.format("%02d", hours) + ":" + String.format("%02d", minutes);
     }
 
 }

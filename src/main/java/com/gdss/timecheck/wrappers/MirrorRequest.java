@@ -1,12 +1,11 @@
 package com.gdss.timecheck.wrappers;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 
 public class MirrorRequest {
 
     private String pis;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private YearMonth yearMonth;
 
     public String getPis() {
         return pis;
@@ -16,19 +15,11 @@ public class MirrorRequest {
         this.pis = pis;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public YearMonth getYearMonth() {
+        return yearMonth;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public void setYearMonth(YearMonth yearMonth) {
+        this.yearMonth = yearMonth;
     }
 }

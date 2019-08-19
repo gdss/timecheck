@@ -7,10 +7,12 @@ import com.gdss.timecheck.repositories.specs.ClockinSpec;
 import com.gdss.timecheck.wrappers.ClockinRequest;
 import com.gdss.timecheck.wrappers.MirrorRequest;
 import com.gdss.timecheck.wrappers.MirrorResponse;
+import com.gdss.timecheck.wrappers.MirrorTotal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -37,10 +39,11 @@ public class ClockinService {
 
     public MirrorResponse mirror(MirrorRequest mirrorRequest) {
         Employee employee = employeeService.findByPis(mirrorRequest.getPis());
-        LocalDate startDate = mirrorRequest.getStartDate();
-        LocalDate endDate = mirrorRequest.getEndDate();
+        YearMonth yearMonth = mirrorRequest.getYearMonth();
+        LocalDate startDate = yearMonth.atDay(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
         List<Clockin> clockinList = repository.findAll(ClockinSpec.days(employee, startDate, endDate));
-        return mirrorComponent.build(employee, startDate, endDate, clockinList);
+        return mirrorComponent.build(employee, yearMonth, clockinList);
     }
 
 }

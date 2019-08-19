@@ -1,11 +1,9 @@
 package com.gdss.timecheck.wrappers;
 
-import java.time.LocalTime;
-
 public class MirrorTotal {
 
     private String description;
-    private LocalTime value;
+    private String value;
 
     public String getDescription() {
         return description;
@@ -15,11 +13,11 @@ public class MirrorTotal {
         this.description = description;
     }
 
-    public LocalTime getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(LocalTime value) {
+    public void setValue(String value) {
         this.value = value;
     }
 }
