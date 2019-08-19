@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class ClockinSpec {
 
@@ -19,4 +20,16 @@ public class ClockinSpec {
         };
     }
 
+    /**
+     * <p>Only one register in the same minute is allowed in the system.</p>
+     * @param localDate clocked in date
+     * @param localTime clocked in time
+     */
+    public static Specification checkExists(LocalDate localDate, LocalTime localTime) {
+        return (Specification<Clockin>) (root, query, cb) -> {
+            Predicate datePredicate = cb.equal(root.get(Clockin_.date), localDate);
+            Predicate timePredicate = cb.equal(root.get(Clockin_.time), localTime);
+            return cb.and(datePredicate, timePredicate);
+        };
+    }
 }

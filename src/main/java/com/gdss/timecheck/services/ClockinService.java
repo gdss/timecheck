@@ -1,5 +1,6 @@
 package com.gdss.timecheck.services;
 
+import com.gdss.timecheck.MinuteClockinException;
 import com.gdss.timecheck.models.Clockin;
 import com.gdss.timecheck.models.Employee;
 import com.gdss.timecheck.repositories.ClockinRepository;
@@ -7,13 +8,15 @@ import com.gdss.timecheck.repositories.specs.ClockinSpec;
 import com.gdss.timecheck.wrappers.ClockinRequest;
 import com.gdss.timecheck.wrappers.MirrorRequest;
 import com.gdss.timecheck.wrappers.MirrorResponse;
-import com.gdss.timecheck.wrappers.MirrorTotal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClockinService {
@@ -27,12 +30,21 @@ public class ClockinService {
     @Autowired
     protected MirrorComponent mirrorComponent;
 
-    public Clockin create(ClockinRequest clockinRequest) {
+    public Clockin create(ClockinRequest clockinRequest) throws MinuteClockinException {
         Employee employee = employeeService.findByPis(clockinRequest.getPis());
+
+        LocalDate localDate = clockinRequest.getDateTime().toLocalDate();
+        LocalTime localTime = clockinRequest.getDateTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES);
+
+        Optional findOne = repository.findOne(ClockinSpec.checkExists(localDate, localTime));
+        if (findOne.isPresent()) {
+            throw new MinuteClockinException();
+        }
+
         Clockin clockin = new Clockin();
         clockin.setEmployee(employee);
-        clockin.setDate(clockinRequest.getDateTime().toLocalDate());
-        clockin.setTime(clockinRequest.getDateTime().toLocalTime());
+        clockin.setDate(localDate);
+        clockin.setTime(localTime);
         repository.save(clockin);
         return clockin;
     }

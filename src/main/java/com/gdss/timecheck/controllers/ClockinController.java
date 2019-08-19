@@ -1,5 +1,6 @@
 package com.gdss.timecheck.controllers;
 
+import com.gdss.timecheck.MinuteClockinException;
 import com.gdss.timecheck.models.Clockin;
 import com.gdss.timecheck.wrappers.ClockinRequest;
 import com.gdss.timecheck.wrappers.MirrorRequest;
@@ -21,7 +22,7 @@ public class ClockinController {
     protected ClockinService service;
 
     @PostMapping("/create")
-    public ResponseEntity<Clockin> create(@RequestBody ClockinRequest clockinRequest) {
+    public ResponseEntity<Clockin> create(@RequestBody ClockinRequest clockinRequest) throws MinuteClockinException {
         Clockin clockin = service.create(clockinRequest);
         return new ResponseEntity<>(clockin, HttpStatus.OK);
     }
