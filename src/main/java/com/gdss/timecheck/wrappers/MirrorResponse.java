@@ -2,14 +2,14 @@ package com.gdss.timecheck.wrappers;
 
 import com.gdss.timecheck.models.Employee;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public class MirrorResponse {
 
     private Employee employee;
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private List<MirrorDay> dayList;
 
     public Employee getEmployee() {
@@ -20,19 +20,19 @@ public class MirrorResponse {
         this.employee = employee;
     }
 
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

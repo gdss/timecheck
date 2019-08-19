@@ -7,6 +7,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Entity
@@ -18,11 +21,9 @@ public class Clockin extends AbstractEntity {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    @Temporal(TemporalType.DATE)
-    private Date date;
+    private LocalDate date;
 
-    @Temporal(TemporalType.TIME)
-    private Date time;
+    private LocalTime time;
 
     public Employee getEmployee() {
         return employee;
@@ -32,19 +33,19 @@ public class Clockin extends AbstractEntity {
         this.employee = employee;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public Date getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 }

@@ -6,11 +6,11 @@ import com.gdss.timecheck.models.Employee;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Predicate;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class ClockinSpec {
 
-    public static Specification<Clockin> days(Employee employee, Date startDate, Date endDate) {
+    public static Specification<Clockin> days(Employee employee, LocalDate startDate, LocalDate endDate) {
         return (Specification<Clockin>) (root, query, cb) -> {
             Predicate pisPredicate = cb.equal(root.get(Clockin_.employee), employee);
             Predicate datePredicate = cb.between(root.get(Clockin_.date), startDate, endDate);
