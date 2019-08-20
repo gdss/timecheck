@@ -6,8 +6,9 @@ import java.util.List;
 public class MirrorDay {
 
     private LocalDate date;
-    private List<String> checkList;
+    private List<String> timeList;
     private String workedHoursDay;
+    private boolean restedIntervalOk;
 
     public LocalDate getDate() {
         return date;
@@ -17,12 +18,12 @@ public class MirrorDay {
         this.date = date;
     }
 
-    public List<String> getCheckList() {
-        return checkList;
+    public List<String> getTimeList() {
+        return timeList;
     }
 
-    public void setCheckList(List<String> checkList) {
-        this.checkList = checkList;
+    public void setTimeList(List<String> timeList) {
+        this.timeList = timeList;
     }
 
     public String getWorkedHoursDay() {
@@ -31,5 +32,13 @@ public class MirrorDay {
 
     public void setWorkedHoursDay(String workedHoursDay) {
         this.workedHoursDay = workedHoursDay;
+    }
+
+    public boolean isRestedIntervalOk() {
+        return restedIntervalOk;
+    }
+
+    public void setRestedIntervalOk(boolean restedIntervalOk) {
+        this.restedIntervalOk = restedIntervalOk;
     }
 }

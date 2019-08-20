@@ -1,6 +1,6 @@
 package com.gdss.timecheck.controllers;
 
-import com.gdss.timecheck.MinuteClockinException;
+import com.gdss.timecheck.exceptions.MinuteClockinException;
 import com.gdss.timecheck.models.Clockin;
 import com.gdss.timecheck.wrappers.ClockinRequest;
 import com.gdss.timecheck.wrappers.MirrorRequest;

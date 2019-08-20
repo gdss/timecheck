@@ -1,4 +1,4 @@
-package com.gdss.timecheck;
+package com.gdss.timecheck.exceptions;
 
 public class MinuteClockinException extends Exception {
 

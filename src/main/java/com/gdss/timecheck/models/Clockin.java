@@ -1,20 +1,23 @@
 package com.gdss.timecheck.models;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "clock_in")
-public class Clockin extends AbstractEntity {
+public class Clockin {
+
+    @Id
+    @GeneratedValue
+    protected UUID id;
 
     @NotNull
     @ManyToOne
@@ -24,6 +27,14 @@ public class Clockin extends AbstractEntity {
     private LocalDate date;
 
     private LocalTime time;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
     public Employee getEmployee() {
         return employee;

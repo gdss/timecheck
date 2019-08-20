@@ -32,13 +32,17 @@ public class MirrorComponent {
             LocalDate date = entry.getKey();
             List<LocalTime> timeList = entry.getValue();
 
-            Duration totalDayDuration = getWorkedHours(date, timeList);
-            totalMonthDuration = totalMonthDuration.plus(totalDayDuration);
+            Duration workedHoursDayDuration = getWorkedHours(date, timeList);
+            totalMonthDuration = totalMonthDuration.plus(workedHoursDayDuration);
+
+            Duration restHoursDayDuration = getRestedHours(date, timeList);
+            boolean restedIntervalOk = verifyRestedInterval(workedHoursDayDuration, restHoursDayDuration);
 
             MirrorDay day = new MirrorDay();
             day.setDate(date);
-            day.setCheckList(timeList.stream().map(LocalTime::toString).collect(Collectors.toList()));
-            day.setWorkedHoursDay(durationToString(totalDayDuration));
+            day.setTimeList(timeList.stream().map(LocalTime::toString).collect(Collectors.toList()));
+            day.setWorkedHoursDay(durationToString(workedHoursDayDuration));
+            day.setRestedIntervalOk(restedIntervalOk);
             dayList.add(day);
         }
 
@@ -92,6 +96,34 @@ public class MirrorComponent {
             totalDuration = totalDuration.plus(duration);
         }
         return totalDuration;
+    }
+
+    private Duration getRestedHours(LocalDate date, List<LocalTime> timeList) {
+        Duration totalDuration = Duration.ZERO;
+        for (int i = 1; i < timeList.size() - 1; i = i + 2) {
+            LocalTime time1 = timeList.get(i);
+            LocalTime time2 = timeList.get(i + 1);
+            Duration duration = Duration.between(time1, time2);
+            totalDuration = totalDuration.plus(duration);
+        }
+        return totalDuration;
+    }
+
+    private boolean verifyRestedInterval(Duration workedHoursDayDuration, Duration restHoursDayDuration) {
+        long workedHours = workedHoursDayDuration.toHours();
+        long restedMinutes = restHoursDayDuration.toMinutes();
+
+        if (workedHours < 4) {
+            // Abaixo de 4 horas trabalhas não é necessário descanso
+            return true;
+        } else if (workedHours < 6 && restedMinutes >= 15) {
+            // Acima de 4 horas e abaixo de 6 horas trabalhadas é necessário um descanso mínimo de 15 minutos.
+            return true;
+        } else if (workedHours >= 6 && restedMinutes >= 60) {
+            // Acima de 6 horas trabalhadas é necessário um descanso mínimo de 1 hora
+            return true;
+        }
+        return false;
     }
 
     private String durationToString(Duration duration) {

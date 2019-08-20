@@ -1,6 +1,6 @@
 package com.gdss.timecheck.services;
 
-import com.gdss.timecheck.MinuteClockinException;
+import com.gdss.timecheck.exceptions.MinuteClockinException;
 import com.gdss.timecheck.models.Clockin;
 import com.gdss.timecheck.models.Employee;
 import com.gdss.timecheck.repositories.ClockinRepository;
