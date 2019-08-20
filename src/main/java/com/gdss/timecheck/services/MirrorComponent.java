@@ -4,7 +4,6 @@ import com.gdss.timecheck.models.Clockin;
 import com.gdss.timecheck.models.Employee;
 import com.gdss.timecheck.wrappers.MirrorDay;
 import com.gdss.timecheck.wrappers.MirrorResponse;
-import com.gdss.timecheck.wrappers.MirrorTotal;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -19,9 +18,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class MirrorComponent {
-
-    private static final String WORKED_HOURS_DAY = "Horas trabalhadas";
-    private static final String WORKED_HOURS_MONTH = "Horas trabalhadas no mês";
 
     public MirrorResponse build(Employee employee, YearMonth yearMonth, List<Clockin> clockinList) {
         Map<LocalDate, List<LocalTime>> dateTimeListMap = clockinList.stream().collect(
@@ -39,26 +35,18 @@ public class MirrorComponent {
             Duration totalDayDuration = getWorkedHours(date, timeList);
             totalMonthDuration = totalMonthDuration.plus(totalDayDuration);
 
-            MirrorTotal dayTotal = new MirrorTotal();
-            dayTotal.setDescription(WORKED_HOURS_DAY);
-            dayTotal.setValue(durationToString(totalDayDuration));
-
             MirrorDay day = new MirrorDay();
             day.setDate(date);
             day.setCheckList(timeList.stream().map(LocalTime::toString).collect(Collectors.toList()));
-            day.setTotal(dayTotal);
+            day.setWorkedHoursDay(durationToString(totalDayDuration));
             dayList.add(day);
         }
-
-        MirrorTotal monthTotal = new MirrorTotal();
-        monthTotal.setDescription(WORKED_HOURS_MONTH);
-        monthTotal.setValue(durationToString(totalMonthDuration));
 
         MirrorResponse mirrorResponse = new MirrorResponse();
         mirrorResponse.setDayList(dayList);
         mirrorResponse.setEmployee(employee);
         mirrorResponse.setYearMonth(yearMonth);
-        mirrorResponse.setTotal(monthTotal);
+        mirrorResponse.setWorkedHoursMonth(durationToString(totalMonthDuration));
         return mirrorResponse;
     }
 

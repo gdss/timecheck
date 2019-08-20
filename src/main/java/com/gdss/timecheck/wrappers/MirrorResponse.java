@@ -10,7 +10,7 @@ public class MirrorResponse {
     private Employee employee;
     private YearMonth yearMonth;
     private List<MirrorDay> dayList;
-    private MirrorTotal total;
+    private String workedHoursMonth;
 
     public Employee getEmployee() {
         return employee;
@@ -36,11 +36,11 @@ public class MirrorResponse {
         this.dayList = dayList;
     }
 
-    public MirrorTotal getTotal() {
-        return total;
+    public String getWorkedHoursMonth() {
+        return workedHoursMonth;
     }
 
-    public void setTotal(MirrorTotal total) {
-        this.total = total;
+    public void setWorkedHoursMonth(String workedHoursMonth) {
+        this.workedHoursMonth = workedHoursMonth;
     }
 }

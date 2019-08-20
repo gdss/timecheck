@@ -1,14 +1,13 @@
 package com.gdss.timecheck.wrappers;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 public class MirrorDay {
 
     private LocalDate date;
     private List<String> checkList;
-    private MirrorTotal total;
+    private String workedHoursDay;
 
     public LocalDate getDate() {
         return date;
@@ -26,11 +25,11 @@ public class MirrorDay {
         this.checkList = checkList;
     }
 
-    public MirrorTotal getTotal() {
-        return total;
+    public String getWorkedHoursDay() {
+        return workedHoursDay;
     }
 
-    public void setTotal(MirrorTotal total) {
-        this.total = total;
+    public void setWorkedHoursDay(String workedHoursDay) {
+        this.workedHoursDay = workedHoursDay;
     }
 }
