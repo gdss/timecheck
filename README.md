@@ -10,6 +10,11 @@ Timecheck is a Java API to control employees work time.
 
 ## Usage
 
+### Basic Authentication
+
+- user: admin
+- password: password
+
 ### Create a new employee
 
 ```
