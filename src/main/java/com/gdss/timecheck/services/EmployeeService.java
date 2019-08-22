@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class EmployeeService {
 
     @Autowired
-    protected EmployeeRepository repository;
+    EmployeeRepository repository;
 
     public Employee findByPis(String pis) {
         return repository.findByPis(pis);

@@ -22,13 +22,13 @@ import java.util.Optional;
 public class ClockinService {
 
     @Autowired
-    protected ClockinRepository repository;
+    ClockinRepository repository;
 
     @Autowired
-    protected EmployeeService employeeService;
+    EmployeeService employeeService;
 
     @Autowired
-    protected MirrorComponent mirrorComponent;
+    MirrorComponent mirrorComponent;
 
     public Clockin create(ClockinRequest clockinRequest) throws MinuteClockinException {
         Employee employee = employeeService.findByPis(clockinRequest.getPis());
@@ -45,8 +45,7 @@ public class ClockinService {
         clockin.setEmployee(employee);
         clockin.setDate(localDate);
         clockin.setTime(localTime);
-        repository.save(clockin);
-        return clockin;
+        return repository.save(clockin);
     }
 
     public MirrorResponse mirror(MirrorRequest mirrorRequest) {

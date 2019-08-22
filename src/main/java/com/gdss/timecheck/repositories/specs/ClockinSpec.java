@@ -25,7 +25,7 @@ public class ClockinSpec {
      * @param localDate clocked in date
      * @param localTime clocked in time
      */
-    public static Specification checkExists(LocalDate localDate, LocalTime localTime) {
+    public static Specification<Clockin> checkExists(LocalDate localDate, LocalTime localTime) {
         return (Specification<Clockin>) (root, query, cb) -> {
             Predicate datePredicate = cb.equal(root.get(Clockin_.date), localDate);
             Predicate timePredicate = cb.equal(root.get(Clockin_.time), localTime);

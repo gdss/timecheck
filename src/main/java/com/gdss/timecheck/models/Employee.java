@@ -13,18 +13,18 @@ public class Employee {
 
     @Id
     @GeneratedValue
-    protected UUID id;
+    private Long id;
 
     private String name;
 
     @Column(unique = true)
     private String pis;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

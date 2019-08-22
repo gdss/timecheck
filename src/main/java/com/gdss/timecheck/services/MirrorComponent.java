@@ -54,7 +54,7 @@ public class MirrorComponent {
         return mirrorResponse;
     }
 
-    private Duration getWorkedHours(LocalDate date, List<LocalTime> timeList) {
+    public Duration getWorkedHours(LocalDate date, List<LocalTime> timeList) {
         Duration totalDuration = Duration.ZERO;
         for (int i = 0; i < timeList.size() - 1; i = i + 2) {
             LocalTime time1 = timeList.get(i);
@@ -64,7 +64,7 @@ public class MirrorComponent {
             if (time1.getHour() < 6) {
                 // Para trabalho realizado antes das 06:00 a cada 60 minutos trabalhados são contabilizados 72 minutos.
                 if (time2.getHour() >= 6) {
-                    LocalTime constraint = LocalTime.of(6, 00);
+                    LocalTime constraint = LocalTime.of(6, 0);
                     duration = Duration.ofMinutes((long) (duration.toMinutes() + Duration.between(time1, constraint).toMinutes() * 0.2));
                 } else {
                     duration = Duration.ofMinutes((long) (duration.toMinutes() * 1.2));
@@ -74,7 +74,7 @@ public class MirrorComponent {
             if (time2.getHour() >= 22) {
                 // Para trabalho realizado após as 22:00 a cada 60 minutos trabalhados são contabilizados 72 minutos.
                 if (time1.getHour() < 22) {
-                    LocalTime constraint = LocalTime.of(22, 00);
+                    LocalTime constraint = LocalTime.of(22, 0);
                     duration = Duration.ofMinutes((long) (duration.toMinutes() + Duration.between(constraint, time2).toMinutes() * 0.2));
                 } else {
                     duration = Duration.ofMinutes((long) (duration.toMinutes() * 1.2));
@@ -98,7 +98,7 @@ public class MirrorComponent {
         return totalDuration;
     }
 
-    private Duration getRestedHours(LocalDate date, List<LocalTime> timeList) {
+    public Duration getRestedHours(LocalDate date, List<LocalTime> timeList) {
         Duration totalDuration = Duration.ZERO;
         for (int i = 1; i < timeList.size() - 1; i = i + 2) {
             LocalTime time1 = timeList.get(i);
@@ -109,7 +109,7 @@ public class MirrorComponent {
         return totalDuration;
     }
 
-    private boolean verifyRestedInterval(Duration workedHoursDayDuration, Duration restHoursDayDuration) {
+    public boolean verifyRestedInterval(Duration workedHoursDayDuration, Duration restHoursDayDuration) {
         long workedHours = workedHoursDayDuration.toHours();
         long restedMinutes = restHoursDayDuration.toMinutes();
 

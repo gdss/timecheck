@@ -2,10 +2,10 @@ package com.gdss.timecheck.controllers;
 
 import com.gdss.timecheck.exceptions.MinuteClockinException;
 import com.gdss.timecheck.models.Clockin;
+import com.gdss.timecheck.services.ClockinService;
 import com.gdss.timecheck.wrappers.ClockinRequest;
 import com.gdss.timecheck.wrappers.MirrorRequest;
 import com.gdss.timecheck.wrappers.MirrorResponse;
-import com.gdss.timecheck.services.ClockinService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClockinController {
 
     @Autowired
-    protected ClockinService service;
+    ClockinService service;
 
     @PostMapping("/create")
     public ResponseEntity<Clockin> create(@RequestBody ClockinRequest clockinRequest) throws MinuteClockinException {

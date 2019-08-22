@@ -17,7 +17,7 @@ public class Clockin {
 
     @Id
     @GeneratedValue
-    protected UUID id;
+    private Long id;
 
     @NotNull
     @ManyToOne
@@ -28,11 +28,11 @@ public class Clockin {
 
     private LocalTime time;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -18,7 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class EmployeeController {
 
     @Autowired
-    protected EmployeeService service;
+    EmployeeService service;
 
     @GetMapping(params = "pis")
     public ResponseEntity<Employee> findByPis(@RequestParam String pis) {
