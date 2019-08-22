@@ -58,8 +58,6 @@ public class EmployeeServiceTests {
 
     @Test
     public void whenFindByInvalidPis_thenReturnNull() {
-        when(employeeRepository.findByPis(EMPLOYEE_PIS)).thenReturn(employeeMock);
-
         Employee employee = employeeService.findByPis(any());
         assertNull(employee);
     }
