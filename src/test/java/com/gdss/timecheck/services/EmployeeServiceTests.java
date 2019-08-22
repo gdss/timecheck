@@ -1,4 +1,4 @@
-package com.gdss.timecheck;
+package com.gdss.timecheck.services;
 
 import com.gdss.timecheck.models.Employee;
 import com.gdss.timecheck.repositories.EmployeeRepository;

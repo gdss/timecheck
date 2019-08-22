@@ -1,6 +1,5 @@
-package com.gdss.timecheck;
+package com.gdss.timecheck.services;
 
-import com.gdss.timecheck.services.MirrorComponent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -10,7 +9,6 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,43 +26,77 @@ public class MirrorComponentTests {
 
     @Test
     public void whenWorkLessThan4Hours_thenRestNoNecessary() {
-        when(mirrorComponent.verifyRestedInterval(any(), any())).thenCallRealMethod();
+        when(mirrorComponent.isRestedIntervalOk(any())).thenCallRealMethod();
 
-        Duration workedHours = Duration.of(3, ChronoUnit.HOURS);
+        List<LocalTime> timeList = new ArrayList<>();
+        timeList.add(LocalTime.of(8, 0));
+        timeList.add(LocalTime.of(11, 0));
 
-        boolean noRested = mirrorComponent.verifyRestedInterval(workedHours, Duration.ZERO);
+        boolean noRested = mirrorComponent.isRestedIntervalOk(timeList);
         assertTrue(noRested);
     }
 
     @Test
     public void whenWorkBetween4And6Hours_thenRest15Minutes() {
-        when(mirrorComponent.verifyRestedInterval(any(), any())).thenCallRealMethod();
+        when(mirrorComponent.isRestedIntervalOk(any())).thenCallRealMethod();
 
-        Duration workedHours = Duration.of(5, ChronoUnit.HOURS);
+        List<LocalTime> timeList = new ArrayList<>();
+        timeList.add(LocalTime.of(8, 0));
+        timeList.add(LocalTime.of(12, 0));
+        timeList.add(LocalTime.of(12, 14));
+        timeList.add(LocalTime.of(13, 0));
 
-        boolean restedFourteenMinutes = mirrorComponent.verifyRestedInterval(workedHours, Duration.of(14, ChronoUnit.MINUTES));
+        boolean restedFourteenMinutes = mirrorComponent.isRestedIntervalOk(timeList);
         assertFalse(restedFourteenMinutes);
 
-        boolean restedFifteenMinutes = mirrorComponent.verifyRestedInterval(workedHours, Duration.of(15, ChronoUnit.MINUTES));
+        timeList = new ArrayList<>();
+        timeList.add(LocalTime.of(8, 0));
+        timeList.add(LocalTime.of(12, 0));
+        timeList.add(LocalTime.of(12, 15));
+        timeList.add(LocalTime.of(13, 0));
+
+        boolean restedFifteenMinutes = mirrorComponent.isRestedIntervalOk(timeList);
         assertTrue(restedFifteenMinutes);
 
-        boolean restedSixteenMinutes = mirrorComponent.verifyRestedInterval(workedHours, Duration.of(16, ChronoUnit.MINUTES));
+        timeList = new ArrayList<>();
+        timeList.add(LocalTime.of(8, 0));
+        timeList.add(LocalTime.of(12, 0));
+        timeList.add(LocalTime.of(12, 16));
+        timeList.add(LocalTime.of(13, 0));
+
+        boolean restedSixteenMinutes = mirrorComponent.isRestedIntervalOk(timeList);
         assertTrue(restedSixteenMinutes);
     }
 
     @Test
     public void whenWorkMoreThan6Hours_thenRest60Minutes() {
-        when(mirrorComponent.verifyRestedInterval(any(), any())).thenCallRealMethod();
+        when(mirrorComponent.isRestedIntervalOk(any())).thenCallRealMethod();
 
-        Duration workedHours = Duration.of(7, ChronoUnit.HOURS);
+        List<LocalTime> timeList = new ArrayList<>();
+        timeList.add(LocalTime.of(8, 0));
+        timeList.add(LocalTime.of(11, 30));
+        timeList.add(LocalTime.of(12, 20));
+        timeList.add(LocalTime.of(17, 0));
 
-        boolean restedFiftyMinutes = mirrorComponent.verifyRestedInterval(workedHours, Duration.of(50, ChronoUnit.MINUTES));
+        boolean restedFiftyMinutes = mirrorComponent.isRestedIntervalOk(timeList);
         assertFalse(restedFiftyMinutes);
 
-        boolean restedSixtyMinutes = mirrorComponent.verifyRestedInterval(workedHours, Duration.of(60, ChronoUnit.MINUTES));
+        timeList = new ArrayList<>();
+        timeList.add(LocalTime.of(8, 0));
+        timeList.add(LocalTime.of(11, 30));
+        timeList.add(LocalTime.of(12, 30));
+        timeList.add(LocalTime.of(17, 0));
+
+        boolean restedSixtyMinutes = mirrorComponent.isRestedIntervalOk(timeList);
         assertTrue(restedSixtyMinutes);
 
-        boolean restedSeventyMinutes = mirrorComponent.verifyRestedInterval(workedHours, Duration.of(70, ChronoUnit.MINUTES));
+        timeList = new ArrayList<>();
+        timeList.add(LocalTime.of(8, 0));
+        timeList.add(LocalTime.of(11, 30));
+        timeList.add(LocalTime.of(12, 40));
+        timeList.add(LocalTime.of(17, 0));
+
+        boolean restedSeventyMinutes = mirrorComponent.isRestedIntervalOk(timeList);
         assertTrue(restedSeventyMinutes);
     }
 

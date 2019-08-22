@@ -35,14 +35,11 @@ public class MirrorComponent {
             Duration workedHoursDayDuration = getWorkedHours(date, timeList);
             totalMonthDuration = totalMonthDuration.plus(workedHoursDayDuration);
 
-            Duration restHoursDayDuration = getRestedHours(date, timeList);
-            boolean restedIntervalOk = verifyRestedInterval(workedHoursDayDuration, restHoursDayDuration);
-
             MirrorDay day = new MirrorDay();
             day.setDate(date);
             day.setTimeList(timeList.stream().map(LocalTime::toString).collect(Collectors.toList()));
             day.setWorkedHoursDay(durationToString(workedHoursDayDuration));
-            day.setRestedIntervalOk(restedIntervalOk);
+            day.setRestedIntervalOk(isRestedIntervalOk(timeList));
             dayList.add(day);
         }
 
@@ -54,76 +51,105 @@ public class MirrorComponent {
         return mirrorResponse;
     }
 
+    /**
+     * Aos sábados a cada 60 minutos trabalhados são contabilizados 90 minutos.
+     * Aos domingos a cada 60 minutos trabalhados são contabilizados 120 minutos
+     * De segunda a sexta feira a cada 60 minutos trabalhados são contabilizados 60 minutos.
+     *
+     * @param date
+     * @param duration
+     * @return
+     */
+    private Duration getDurationConstraintDay(LocalDate date, Duration duration) {
+        Duration durationConstraintDay = Duration.ZERO;
+        switch (date.getDayOfWeek()) {
+            case SATURDAY:
+                durationConstraintDay = Duration.ofMinutes((long) (duration.toMinutes() * 0.5));
+                break;
+            case SUNDAY:
+                durationConstraintDay = duration;
+                break;
+        }
+        return durationConstraintDay;
+    }
+
+    /**
+     * Para trabalho realizado entre as 22:00 e 06:00 a cada 60 minutos trabalhados são contabilizados 72 minutos.
+     *
+     * @param time1
+     * @param time2
+     * @param duration
+     * @return
+     */
+    private Duration getDurationConstraintHour(LocalTime time1, LocalTime time2, Duration duration) {
+        Duration durationConstraintHour = Duration.ZERO;
+        if (time1.getHour() < 6) {
+            if (time2.getHour() >= 6) {
+                LocalTime constraint = LocalTime.of(6, 0);
+                durationConstraintHour = Duration.ofMinutes((long) (Duration.between(time1, constraint).toMinutes() * 0.2));
+            } else {
+                durationConstraintHour = Duration.ofMinutes((long) (duration.toMinutes() * 0.2));
+            }
+        }
+        if (time2.getHour() >= 22) {
+            if (time1.getHour() < 22) {
+                LocalTime constraint = LocalTime.of(22, 0);
+                durationConstraintHour = Duration.ofMinutes((long) (Duration.between(constraint, time2).toMinutes() * 0.2));
+            } else {
+                durationConstraintHour = Duration.ofMinutes((long) (duration.toMinutes() * 0.2));
+            }
+        }
+        return durationConstraintHour;
+    }
+
+
+    /**
+     * Abaixo de 4 horas trabalhas não é necessário descanso
+     * Acima de 4 horas e abaixo de 6 horas trabalhadas é necessário um descanso mínimo de 15 minutos.
+     * Acima de 6 horas trabalhadas é necessário um descanso mínimo de 1 hora
+     *
+     * @param timeList
+     * @return
+     */
+    public boolean isRestedIntervalOk(List<LocalTime> timeList) {
+        Duration workedDuration = Duration.ZERO;
+        Duration restedDuration = Duration.ZERO;
+        for (int i = 0; i < timeList.size() - 1; i = i + 2) {
+            LocalTime time1 = timeList.get(i);
+            LocalTime time2 = timeList.get(i + 1);
+            workedDuration = workedDuration.plus(Duration.between(time1, time2));
+
+            if (i + 2 < timeList.size()) {
+                LocalTime time3 = timeList.get(i + 2);
+                restedDuration = restedDuration.plus(Duration.between(time2, time3));
+            }
+        }
+
+        long workedHours = workedDuration.toHours();
+        long restedMinutes = restedDuration.toMinutes();
+
+        if (workedHours < 4) {
+            return true;
+        } else if (workedHours < 6 && restedMinutes >= 15) {
+            return true;
+        } else if (workedHours >= 6 && restedMinutes >= 60) {
+            return true;
+        }
+
+        return false;
+    }
+
     public Duration getWorkedHours(LocalDate date, List<LocalTime> timeList) {
         Duration totalDuration = Duration.ZERO;
         for (int i = 0; i < timeList.size() - 1; i = i + 2) {
             LocalTime time1 = timeList.get(i);
             LocalTime time2 = timeList.get(i + 1);
             Duration duration = Duration.between(time1, time2);
-
-            if (time1.getHour() < 6) {
-                // Para trabalho realizado antes das 06:00 a cada 60 minutos trabalhados são contabilizados 72 minutos.
-                if (time2.getHour() >= 6) {
-                    LocalTime constraint = LocalTime.of(6, 0);
-                    duration = Duration.ofMinutes((long) (duration.toMinutes() + Duration.between(time1, constraint).toMinutes() * 0.2));
-                } else {
-                    duration = Duration.ofMinutes((long) (duration.toMinutes() * 1.2));
-                }
-            }
-
-            if (time2.getHour() >= 22) {
-                // Para trabalho realizado após as 22:00 a cada 60 minutos trabalhados são contabilizados 72 minutos.
-                if (time1.getHour() < 22) {
-                    LocalTime constraint = LocalTime.of(22, 0);
-                    duration = Duration.ofMinutes((long) (duration.toMinutes() + Duration.between(constraint, time2).toMinutes() * 0.2));
-                } else {
-                    duration = Duration.ofMinutes((long) (duration.toMinutes() * 1.2));
-                }
-            }
-
-            switch (date.getDayOfWeek()) {
-                case SATURDAY:
-                    // Aos sábados a cada 60 minutos trabalhados são contabilizados 90 minutos.
-                    duration = Duration.ofMinutes((long) (duration.toMinutes() * 1.5));
-                    break;
-                case SUNDAY:
-                    // Aos domingos a cada 60 minutos trabalhados são contabilizados 120 minutos
-                    duration = duration.multipliedBy(2);
-                    break;
-                default:
-                    // De segunda a sexta feira a cada 60 minutos trabalhados são contabilizados 60 minutos.
-            }
-            totalDuration = totalDuration.plus(duration);
+            Duration durationConstraintDay = getDurationConstraintDay(date, duration);
+            Duration durationConstraintHour = getDurationConstraintHour(time1, time2, duration);
+            totalDuration = totalDuration.plus(duration).plus(durationConstraintDay).plus(durationConstraintHour);
         }
         return totalDuration;
-    }
-
-    public Duration getRestedHours(LocalDate date, List<LocalTime> timeList) {
-        Duration totalDuration = Duration.ZERO;
-        for (int i = 1; i < timeList.size() - 1; i = i + 2) {
-            LocalTime time1 = timeList.get(i);
-            LocalTime time2 = timeList.get(i + 1);
-            Duration duration = Duration.between(time1, time2);
-            totalDuration = totalDuration.plus(duration);
-        }
-        return totalDuration;
-    }
-
-    public boolean verifyRestedInterval(Duration workedHoursDayDuration, Duration restHoursDayDuration) {
-        long workedHours = workedHoursDayDuration.toHours();
-        long restedMinutes = restHoursDayDuration.toMinutes();
-
-        if (workedHours < 4) {
-            // Abaixo de 4 horas trabalhas não é necessário descanso
-            return true;
-        } else if (workedHours < 6 && restedMinutes >= 15) {
-            // Acima de 4 horas e abaixo de 6 horas trabalhadas é necessário um descanso mínimo de 15 minutos.
-            return true;
-        } else if (workedHours >= 6 && restedMinutes >= 60) {
-            // Acima de 6 horas trabalhadas é necessário um descanso mínimo de 1 hora
-            return true;
-        }
-        return false;
     }
 
     private String durationToString(Duration duration) {

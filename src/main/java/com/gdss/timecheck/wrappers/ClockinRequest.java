@@ -1,10 +1,14 @@
 package com.gdss.timecheck.wrappers;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 
 public class ClockinRequest {
 
     private String pis;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime dateTime;
 
     public String getPis() {

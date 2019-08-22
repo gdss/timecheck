@@ -1,4 +1,4 @@
-package com.gdss.timecheck;
+package com.gdss.timecheck.services;
 
 import com.gdss.timecheck.exceptions.MinuteClockinException;
 import com.gdss.timecheck.models.Clockin;
