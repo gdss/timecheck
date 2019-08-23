@@ -31,12 +31,13 @@ public class ClockinService {
     MirrorComponent mirrorComponent;
 
     public Clockin create(ClockinRequest clockinRequest) throws MinuteClockinException {
-        Employee employee = employeeService.findByPis(clockinRequest.getPis());
+        String pis = clockinRequest.getPis();
+        Employee employee = employeeService.findByPis(pis);
 
         LocalDate localDate = clockinRequest.getDateTime().toLocalDate();
         LocalTime localTime = clockinRequest.getDateTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES);
 
-        Optional findOne = repository.findOne(ClockinSpec.checkExists(localDate, localTime));
+        Optional findOne = repository.findOne(ClockinSpec.checkExists(pis, localDate, localTime));
         if (findOne.isPresent()) {
             throw new MinuteClockinException();
         }
